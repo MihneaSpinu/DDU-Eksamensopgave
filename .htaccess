@@ -1,0 +1,18 @@
+AddType application/x-httpd-php81 .php
+php_flag output_buffering on
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On    
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+    # Rewrite /categories to categories.php
+    RewriteRule ^categories$ app/frontend/pages/designs.php [L]
+
+    # Rewrite /categories/category to categories.php?category=category
+    RewriteRule ^categories/([^/]+)$ app/frontend/pages/categories.php?category=$1 [L]
+
+    # Rewrite /categories/design to categories.php?design=design
+    RewriteRule ^categories/([^/]+)$ app/frontend/pages/categories.php?design=$1 [L]
+</IfModule>
