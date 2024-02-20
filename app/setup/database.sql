@@ -157,14 +157,19 @@ CREATE TABLE `lektier`
     `fag_ID` INT(11) NOT NULL,
     `klasse_ID` INT(11) NOT NULL,
     `lektie_titel` VARCHAR(50) NOT NULL,
-    `lektie_beskrivelse` VARCHAR(50) NOT NULL,
+    `oprettelsesdato` DATE NOT NULL,
     `lektie_dato` DATE NOT NULL,
+    `fordybelsestid` INT(11),
+    `kommentar` VARCHAR(50),
     `gruppe_arbejde` TINYINT(1) NOT NULL DEFAULT 0,
     `usynlig` TINYINT(1) NOT NULL DEFAULT 0,
+    `lektie_fil` VARCHAR(50),
+    `udgivet_af_lærer` INT(11) NOT NULL,
 
     PRIMARY KEY (`lektie_ID`),
     FOREIGN KEY (`fag_ID`) REFERENCES `fag` (`fag_ID`),
-    FOREIGN KEY (`klasse_ID`) REFERENCES `klasse` (`klasse_ID`)
+    FOREIGN KEY (`klasse_ID`) REFERENCES `klasse` (`klasse_ID`),
+    FOREIGN KEY (`udgivet_af_lærer`) REFERENCES `brugere` (`bruger_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -174,12 +179,18 @@ CREATE TABLE `afleveringer`
     `aflevering_ID` INT(11) NOT NULL AUTO_INCREMENT,
     `lektie_ID` INT(11) NOT NULL,
     `elev_ID` INT(11) NOT NULL,
-    `aflevering_dato` DATE NOT NULL,
-    `aflevering_fil` VARCHAR(50) NOT NULL,
+    `aflevering_dato` DATE,
+    `aflevering_fil` VARCHAR(50),
+    `feedback_fil` VARCHAR(50),
+    `kommentar` VARCHAR(50),
+    `karakter` INT(11),
+    `bedømt_af_lærer` TINYINT(1),
+    `bedømmelses_dato` DATE,
 
     PRIMARY KEY (`aflevering_ID`),
     FOREIGN KEY (`lektie_ID`) REFERENCES `lektier` (`lektie_ID`),
-    FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`)
+    FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`),
+    FOREIGN KEY (`bedømt_af_lærer`) REFERENCES `brugere` (`bruger_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
