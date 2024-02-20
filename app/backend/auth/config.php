@@ -7,7 +7,7 @@ $current = $remoteSecret;
 $GLOBALS['config'] = array(
 
     'app' => array(
-        'name'          => 'Hamsterbil.dk',
+        'name'          => 'Moodle Eksamensprojekt',
     ),
 
     'mysql' => array(
