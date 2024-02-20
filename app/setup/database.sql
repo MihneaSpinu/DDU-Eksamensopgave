@@ -128,6 +128,16 @@ CREATE TABLE `emner` (
     FOREIGN KEY (`parent_emne_ID`) REFERENCES `emner` (`emne_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DELIMITER //
+CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `emner`
+FOR EACH ROW
+BEGIN
+    IF NEW.parent_emne_ID = NEW.emne_ID THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent emne ID cannot be the same as emne ID';
+    END IF;
+END//
+DELIMITER ;
+
 -- ------------------------------------------------------
 
 CREATE TABLE `fag_klasse_emner` (
