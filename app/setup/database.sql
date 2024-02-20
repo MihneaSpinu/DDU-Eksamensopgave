@@ -24,16 +24,17 @@ SET time_zone = "+00:00";
 CREATE TABLE `bruger_type`
 (
     `bruger_type_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `type`   VARCHAR(50) NOT NULL,
+    `navn`   VARCHAR(50) NOT NULL,
+    `adgange` text NOT NULL,
 
     PRIMARY KEY (`bruger_type_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `bruger_type` (`bruger_type_ID`, `type`) VALUES
-(1, 'elev'),
-(2, 'lærer'),
-(3, 'censor'),
-(4, 'admin');
+INSERT INTO `bruger_type` (`bruger_type_ID`, `navn`, `adgange`) VALUES
+(1, 'elev', '{"redigere_lektier":0,"redigere_afleveringer":0,"administrere_side":0}')
+(2, 'lærer', '{"redigere_lektier":1,"redigere_afleveringer":1,"administrere_side":0}'),
+(3, 'censor', '{"redigere_lektier":0,"redigere_afleveringer":1,"administrere_side":0}'),
+(4, 'admin', '{"redigere_lektier":0,"redigere_afleveringer":0,"administrere_side":1}');
 
 -- --------------------------------------------------------
 
@@ -119,17 +120,40 @@ CREATE TABLE `fag_klasse`
 
 -- -------------------------------------------------------
 
-CREATE TABLE `emner` (
+-- CREATE TABLE `emner` (
+--     `emne_ID` INT(11) NOT NULL AUTO_INCREMENT,
+--     `emne_navn` VARCHAR(50) NOT NULL,
+--     `parent_emne_ID` INT(11),
+
+--     PRIMARY KEY (`emne_ID`),
+--     FOREIGN KEY (`parent_emne_ID`) REFERENCES `emner` (`emne_ID`) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- DELIMITER //
+-- CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `emner`
+-- FOR EACH ROW
+-- BEGIN
+--     IF NEW.parent_emne_ID = NEW.emne_ID THEN
+--         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent emne ID cannot be the same as emne ID';
+--     END IF;
+-- END//
+-- DELIMITER ;
+
+-- ------------------------------------------------------
+
+CREATE TABLE `fag_klasse_emner` (
     `emne_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `fag_klasse_ID` INT(11) NOT NULL,
     `emne_navn` VARCHAR(50) NOT NULL,
     `parent_emne_ID` INT(11),
 
     PRIMARY KEY (`emne_ID`),
-    FOREIGN KEY (`parent_emne_ID`) REFERENCES `emner` (`emne_ID`) ON DELETE CASCADE
+    FOREIGN KEY (`fag_klasse_ID`) REFERENCES `fag_klasse` (`fag_klasse_ID`),
+    FOREIGN KEY (`parent_emne_ID`) REFERENCES `fag_klasse_emner` (`emne_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DELIMITER //
-CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `emner`
+CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `fag_klasse_emner`
 FOR EACH ROW
 BEGIN
     IF NEW.parent_emne_ID = NEW.emne_ID THEN
@@ -137,17 +161,6 @@ BEGIN
     END IF;
 END//
 DELIMITER ;
-
--- ------------------------------------------------------
-
-CREATE TABLE `fag_klasse_emner` (
-    `fag_klasse_ID` INT(11) NOT NULL,
-    `emne_ID` INT(11) NOT NULL,
-
-    PRIMARY KEY (`fag_klasse_ID`, `emne_ID`),
-    FOREIGN KEY (`fag_klasse_ID`) REFERENCES `fag_klasse` (`fag_klasse_ID`),
-    FOREIGN KEY (`emne_ID`) REFERENCES `emner` (`emne_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -157,6 +170,7 @@ CREATE TABLE `lektier`
     `fag_ID` INT(11) NOT NULL,
     `klasse_ID` INT(11) NOT NULL,
     `lektie_titel` VARCHAR(50) NOT NULL,
+    `lektie_beskrivelse` VARCHAR(50) NOT NULL,
     `oprettelsesdato` DATE NOT NULL,
     `lektie_dato` DATE NOT NULL,
     `fordybelsestid` INT(11),
@@ -176,18 +190,17 @@ CREATE TABLE `lektier`
 
 CREATE TABLE `afleveringer`
 (
-    `aflevering_ID` INT(11) NOT NULL AUTO_INCREMENT,
     `lektie_ID` INT(11) NOT NULL,
     `elev_ID` INT(11) NOT NULL,
     `aflevering_dato` DATE,
     `aflevering_fil` VARCHAR(50),
     `feedback_fil` VARCHAR(50),
     `kommentar` VARCHAR(50),
-    `karakter` INT(11),
-    `bedømt_af_lærer` TINYINT(1),
+    `karakter` VARCHAR(50),
+    `bedømt_af_lærer` INT(11),
     `bedømmelses_dato` DATE,
 
-    PRIMARY KEY (`aflevering_ID`),
+    PRIMARY KEY (`lektie_ID`, `elev_ID`),
     FOREIGN KEY (`lektie_ID`) REFERENCES `lektier` (`lektie_ID`),
     FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`),
     FOREIGN KEY (`bedømt_af_lærer`) REFERENCES `brugere` (`bruger_ID`)
