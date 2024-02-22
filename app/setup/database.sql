@@ -21,210 +21,277 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
-CREATE TABLE `bruger_type`
+CREATE TABLE `school`
 (
-    `bruger_type_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `navn`   VARCHAR(50) NOT NULL,
-    `adgange` text NOT NULL,
+    `school_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `school_name` VARCHAR(50) NOT NULL,
+    `school_adress` VARCHAR(50) NOT NULL,
+    `school_zip` INT(11) NOT NULL,
+    `school_city` VARCHAR(50) NOT NULL,
+    `school_phone` VARCHAR(50) NOT NULL,
+    `school_email` VARCHAR(50) NOT NULL,
+    `school_page` VARCHAR(50) NOT NULL,
 
-    PRIMARY KEY (`bruger_type_ID`)
+    PRIMARY KEY (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `bruger_type` (`bruger_type_ID`, `navn`, `adgange`) VALUES
-(1, 'elev', '{"redigere_lektier":0,"redigere_afleveringer":0,"administrere_side":0}')
-(2, 'lærer', '{"redigere_lektier":1,"redigere_afleveringer":1,"administrere_side":0}'),
-(3, 'censor', '{"redigere_lektier":0,"redigere_afleveringer":1,"administrere_side":0}'),
-(4, 'admin', '{"redigere_lektier":0,"redigere_afleveringer":0,"administrere_side":1}');
+INSERT INTO `school` (`school_ID`, `school_name`, `school_adress`, `school_zip`, `school_city`, `school_phone`, `school_email`, `school_page`) VALUES
+(1, 'Hansenberg', 'Skovvangen 28', 6000, 'Kolding', '79 32 01 00', 'hansenberg@email.dk', 'hansenberg.dk');
 
 -- --------------------------------------------------------
 
-CREATE TABLE `brugere`
+CREATE TABLE `user_type`
 (
-    `bruger_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `bruger_type_ID` INT(11) NOT NULL,
-    `fornavn` VARCHAR(50) NOT NULL,
-    `efternavn` VARCHAR(50) NOT NULL,
+    `user_type_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `name`   VARCHAR(50) NOT NULL,
+    `permissions` text NOT NULL,
+
+    PRIMARY KEY (`user_type_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `user_type` (`user_type_ID`, `name`, `permissions`) VALUES
+(1, 'student', '{"redigere_homework":0,"redigere_submissions":0,"administrere_side":0}'),
+(2, 'teacher', '{"redigere_homework":1,"redigere_submissions":1,"administrere_side":0}'),
+(3, 'censor', '{"redigere_homework":0,"redigere_submissions":1,"administrere_side":0}'),
+(4, 'admin', '{"redigere_homework":0,"redigere_submissions":0,"administrere_side":1}');
+
+-- --------------------------------------------------------
+
+CREATE TABLE `users`
+(
+    `uid` INT(11) NOT NULL AUTO_INCREMENT,
+    `user_type_ID` INT(11) NOT NULL,
+    `school_ID` INT(11) NOT NULL,
+    `firstname` VARCHAR(50) NOT NULL,
+    `lastname` VARCHAR(50) NOT NULL,
     `email` VARCHAR(50) NOT NULL,
     `password` VARCHAR(50) NOT NULL,
-    `oprettelsesdato` DATE NOT NULL,
+    `date_created` DATE NOT NULL,
+    `written_absence` INT(11) NOT NULL DEFAULT 0,
     
-    PRIMARY KEY (`bruger_ID`),
-    FOREIGN KEY (`bruger_type_ID`) REFERENCES `bruger_type` (`bruger_type_ID`)
+    PRIMARY KEY (`uid`, `user_type_ID`, `school_ID`),
+    FOREIGN KEY (`user_type_ID`) REFERENCES `user_type` (`user_type_ID`),
+    FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `users` (`uid`, `user_type_ID`, `school_ID`, `firstname`, `lastname`, `email`, `password`, `date_created`, `written_absence`) VALUES
+(1, 1, 1, 'Gunnar Máni', 'Jóhannsson', 'gunn0474@hansenberg.dk', '123456', '2024-02-21', 0),
+(2, 2, 1, 'Torsten Skov', 'Fix', 'teacher@email.dk', '123456', '2024-02-21', 0);
+
+-- --------------------------------------------------------
+
+CREATE TABLE `user_sessions`
+(
+    `session_id` INT(11) NOT NULL AUTO_INCREMENT,
+    `uid` INT(11) NOT NULL,
+    `session_key` VARCHAR(50) NOT NULL,
+    `session_value` VARCHAR(50) NOT NULL,
+    `session_expire` DATE NOT NULL,
+
+    PRIMARY KEY (`session_id`, `uid`),
+    FOREIGN KEY (`uid`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `klasse`
+CREATE TABLE `class`
 (
-    `klasse_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `klasse_navn` VARCHAR(50) NOT NULL,
-    `klasselærer_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `school_ID` INT(11) NOT NULL,
+    `class_name` VARCHAR(50) NOT NULL,
+    `class_teacher_ID` INT(11) NOT NULL,
 
-    PRIMARY KEY (`klasse_ID`),
-    FOREIGN KEY (`klasselærer_ID`) REFERENCES `brugere` (`bruger_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- INSERT INTO `klasse` (`klasse_ID`, `klasse_navn`, `klasselærer_ID`) VALUES
--- (1, '1.U', '1'),
--- (2, '2.U', '1'),
--- (3, '3.U', '1'),
--- (4, '1.X', '2'),
--- (5, '2.X', '2'),
--- (6, '3.X', '2'),
--- (7, '1.Y', '3'),
--- (8, '2.Y', '3'),
--- (9, '3.Y', '3'),
--- (10, '1.Z', '4'),
--- (11, '2.Z', '4'),
--- (12, '3.Z', '4');
-
--- --------------------------------------------------------
-
-CREATE TABLE `fag`
-(
-    `fag_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `fag_navn` VARCHAR(50) NOT NULL,
-    `fag_lærer_ID` INT(11) NOT NULL,
-
-    PRIMARY KEY (`fag_ID`),
-    FOREIGN KEY (`fag_lærer_ID`) REFERENCES `brugere` (`bruger_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Matematik, dansk, engelsk, idehistorie, programmering, fysik, kemi, biologi, samfundsfag, idræt, teknologi, teknikfag A (DDU, Byg og hyg, process), Komm. IT. Lav 3 af hver fag med C B A niveau, undtagen teknikfag A.
-
-
--- --------------------------------------------------------
-
-CREATE TABLE `elev_klasse`
-(
-    `elev_ID` INT(11) NOT NULL,
-    `klasse_ID` INT(11) NOT NULL,
-
-    PRIMARY KEY (`elev_ID`, `klasse_ID`),
-    FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`),
-    FOREIGN KEY (`klasse_ID`) REFERENCES `klasse` (`klasse_ID`)
+    PRIMARY KEY (`class_ID`, `school_ID`),
+    FOREIGN KEY (`class_teacher_ID`) REFERENCES `users` (`uid`),
+    FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `fag_klasse`
+CREATE TABLE `subject`
 (
-    `fag_klasse_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `fag_ID` INT(11) NOT NULL,
-    `klasse_ID` INT(11) NOT NULL,
+    `subject_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `school_ID` INT(11) NOT NULL,
+    `subject_name` VARCHAR(50) NOT NULL,
 
-    PRIMARY KEY (`fag_klasse_ID`),
-    FOREIGN KEY (`fag_ID`) REFERENCES `fag` (`fag_ID`),
-    FOREIGN KEY (`klasse_ID`) REFERENCES `klasse` (`klasse_ID`)
+    PRIMARY KEY (`subject_ID`, `school_ID`),
+    FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`) VALUES
+(1, 1, 'Matematik C'),
+(2, 1, 'Matematik B'),
+(3, 1, 'Matematik A'),
+(4, 1, 'Dansk C'),
+(5, 1, 'Dansk B'),
+(6, 1, 'Dansk A'),
+(7, 1, 'Engelsk C'),
+(8, 1, 'Engelsk B'),
+(9, 1, 'Engelsk A'),
+(10, 1, 'Idehistorie C'),
+(11, 1, 'Idehistorie B'),
+(12, 1, 'Idehistorie A'),
+(13, 1, 'Programmering C'),
+(14, 1, 'Programmering B'),
+(15, 1, 'Programmering A'),
+(16, 1, 'Fysik C'),
+(17, 1, 'Fysik B'),
+(18, 1, 'Fysik A'),
+(19, 1, 'Kemi C'),
+(20, 1, 'Kemi B'),
+(21, 1, 'Kemi A'),
+(22, 1, 'Biologi C'),
+(23, 1, 'Biologi B'),
+(24, 1, 'Biologi A'),
+(25, 1, 'Samfundsfag C'),
+(26, 1, 'Samfundsfag B'),
+(27, 1, 'Samfundsfag A'),
+(28, 1, 'Idræt C'),
+(29, 1, 'Idræt B'),
+(30, 1, 'Idræt A'),
+(31, 1, 'Teknologi C'),
+(32, 1, 'Teknologi B'),
+(33, 1, 'Teknologi A'),
+(34, 1, 'Teknikfag (DDU) A'),
+(35, 1, 'Teknikfag (cityg og hyg) A'),
+(36, 1, 'Teknikfag (Process) A'),
+(37, 1, 'Kommunikation og IT C'),
+(38, 1, 'Kommunikation og IT B'),
+(39, 1, 'Kommunikation og IT A');
+
+-- --------------------------------------------------------
+
+CREATE TABLE `student_class`
+(
+    `student_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL,
+
+    PRIMARY KEY (`student_ID`, `class_ID`),
+    FOREIGN KEY (`student_ID`) REFERENCES `users` (`uid`),
+    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+CREATE TABLE `subject_class`
+(
+    `subject_class_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `subject_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL,  
+    `subject_teacher_ID` INT(11) NOT NULL,
+
+    PRIMARY KEY (`subject_class_ID`, `subject_ID`),
+    FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
+    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- -------------------------------------------------------
 
--- CREATE TABLE `emner` (
---     `emne_ID` INT(11) NOT NULL AUTO_INCREMENT,
---     `emne_navn` VARCHAR(50) NOT NULL,
---     `parent_emne_ID` INT(11),
+-- CREATE TABLE `sections` (
+--     `section_ID` INT(11) NOT NULL AUTO_INCREMENT,
+--     `section_name` VARCHAR(50) NOT NULL,
+--     `parent_section_ID` INT(11),
 
---     PRIMARY KEY (`emne_ID`),
---     FOREIGN KEY (`parent_emne_ID`) REFERENCES `emner` (`emne_ID`) ON DELETE CASCADE
+--     PRIMARY KEY (`section_ID`),
+--     FOREIGN KEY (`parent_section_ID`) REFERENCES `sections` (`section_ID`) ON DELETE CASCADE
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- DELIMITER //
--- CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `emner`
+-- CREATE TRIGGER `check_parent_section_ID_trigger` BEFORE INSERT ON `sections`
 -- FOR EACH ROW
 -- BEGIN
---     IF NEW.parent_emne_ID = NEW.emne_ID THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent emne ID cannot be the same as emne ID';
+--     IF NEW.parent_section_ID = NEW.section_ID THEN
+--         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
 --     END IF;
 -- END//
 -- DELIMITER ;
 
 -- ------------------------------------------------------
 
-CREATE TABLE `fag_klasse_emner` (
-    `emne_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `fag_klasse_ID` INT(11) NOT NULL,
-    `emne_navn` VARCHAR(50) NOT NULL,
-    `parent_emne_ID` INT(11),
+CREATE TABLE `subject_class_sections` (
+    `section_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `subject_class_ID` INT(11) NOT NULL,
+    `section_name` VARCHAR(50) NOT NULL,
+    `parent_section_ID` INT(11),
 
-    PRIMARY KEY (`emne_ID`),
-    FOREIGN KEY (`fag_klasse_ID`) REFERENCES `fag_klasse` (`fag_klasse_ID`),
-    FOREIGN KEY (`parent_emne_ID`) REFERENCES `fag_klasse_emner` (`emne_ID`) ON DELETE CASCADE
+    PRIMARY KEY (`section_ID`),
+    FOREIGN KEY (`subject_class_ID`) REFERENCES `subject_class` (`subject_class_ID`),
+    FOREIGN KEY (`parent_section_ID`) REFERENCES `subject_class_sections` (`section_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DELIMITER //
-CREATE TRIGGER `check_parent_emne_ID_trigger` BEFORE INSERT ON `fag_klasse_emner`
+CREATE TRIGGER `check_parent_section_ID_trigger` BEFORE INSERT ON `subject_class_sections`
 FOR EACH ROW
 BEGIN
-    IF NEW.parent_emne_ID = NEW.emne_ID THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent emne ID cannot be the same as emne ID';
+    IF NEW.parent_section_ID = NEW.section_ID THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
     END IF;
 END//
 DELIMITER ;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `lektier`
+CREATE TABLE `homework`
 (
-    `lektie_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `fag_ID` INT(11) NOT NULL,
-    `klasse_ID` INT(11) NOT NULL,
-    `lektie_titel` VARCHAR(50) NOT NULL,
-    `lektie_beskrivelse` VARCHAR(50) NOT NULL,
-    `oprettelsesdato` DATE NOT NULL,
-    `lektie_dato` DATE NOT NULL,
-    `fordybelsestid` INT(11),
-    `kommentar` VARCHAR(50),
-    `gruppe_arbejde` TINYINT(1) NOT NULL DEFAULT 0,
-    `usynlig` TINYINT(1) NOT NULL DEFAULT 0,
-    `lektie_fil` VARCHAR(50),
-    `udgivet_af_lærer` INT(11) NOT NULL,
+    `homework_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `subject_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL,
+    `homework_titel` VARCHAR(50) NOT NULL,
+    `homework_description` VARCHAR(50) NOT NULL,
+    `date_created` DATE NOT NULL,
+    `homework_dato` DATE NOT NULL,
+    `submission_time` INT(11),
+    `comment` VARCHAR(50),
+    `group_work` TINYINT(1) NOT NULL DEFAULT 0,
+    `hidden` TINYINT(1) NOT NULL DEFAULT 0,
+    `homework_file` VARCHAR(50),
+    `assigned_by` INT(11) NOT NULL,
 
-    PRIMARY KEY (`lektie_ID`),
-    FOREIGN KEY (`fag_ID`) REFERENCES `fag` (`fag_ID`),
-    FOREIGN KEY (`klasse_ID`) REFERENCES `klasse` (`klasse_ID`),
-    FOREIGN KEY (`udgivet_af_lærer`) REFERENCES `brugere` (`bruger_ID`)
+    PRIMARY KEY (`homework_ID`),
+    FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
+    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`),
+    FOREIGN KEY (`assigned_by`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `afleveringer`
+CREATE TABLE `submissions`
 (
-    `lektie_ID` INT(11) NOT NULL,
-    `elev_ID` INT(11) NOT NULL,
-    `aflevering_dato` DATE,
-    `aflevering_fil` VARCHAR(50),
-    `feedback_fil` VARCHAR(50),
-    `kommentar` VARCHAR(50),
-    `karakter` VARCHAR(50),
-    `bedømt_af_lærer` INT(11),
-    `bedømmelses_dato` DATE,
+    `homework_ID` INT(11) NOT NULL,
+    `student_ID` INT(11) NOT NULL,
+    `submission_date` DATE,
+    `submission_file` VARCHAR(50),
+    `feedback_file` VARCHAR(50),
+    `comment` VARCHAR(50),
+    `grade` VARCHAR(50),
+    `marked_by` INT(11),
+    `marked_dato` DATE,
 
-    PRIMARY KEY (`lektie_ID`, `elev_ID`),
-    FOREIGN KEY (`lektie_ID`) REFERENCES `lektier` (`lektie_ID`),
-    FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`),
-    FOREIGN KEY (`bedømt_af_lærer`) REFERENCES `brugere` (`bruger_ID`)
+    PRIMARY KEY (`homework_ID`, `student_ID`),
+    FOREIGN KEY (`homework_ID`) REFERENCES `homework` (`homework_ID`),
+    FOREIGN KEY (`student_ID`) REFERENCES `users` (`uid`),
+    FOREIGN KEY (`marked_by`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `grupper`
+CREATE TABLE `groups`
 (
-    `gruppe_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `lektie_ID` INT(11) NOT NULL,    
+    `group_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `homework_ID` INT(11) NOT NULL,    
 
-    PRIMARY KEY (`gruppe_ID`),
-    FOREIGN KEY (`lektie_ID`) REFERENCES `lektier` (`lektie_ID`)    
+    PRIMARY KEY (`group_ID`, `homework_ID`),
+    FOREIGN KEY (`homework_ID`) REFERENCES `homework` (`homework_ID`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `elever_i_gruppe`
+CREATE TABLE `students_in_group`
 (
-    `gruppe_ID` INT(11) NOT NULL,
-    `elev_ID` INT(11) NOT NULL,
+    `group_ID` INT(11) NOT NULL,
+    `student_ID` INT(11) NOT NULL,
 
-    PRIMARY KEY (`gruppe_ID`, `elev_ID`),
-    FOREIGN KEY (`gruppe_ID`) REFERENCES `grupper` (`gruppe_ID`),
-    FOREIGN KEY (`elev_ID`) REFERENCES `brugere` (`bruger_ID`)
+    PRIMARY KEY (`group_ID`, `student_ID`),
+    FOREIGN KEY (`group_ID`) REFERENCES `groups` (`group_ID`),
+    FOREIGN KEY (`student_ID`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
