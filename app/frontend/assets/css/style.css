@@ -1,0 +1,9 @@
+body {
+    background-color: aliceblue;
+}
+
+footer {
+    background-color: rgb(209, 209, 209);
+    box-shadow: 5px 50vh 10px 50vh rgb(209, 209, 209);
+    color: white;
+}
