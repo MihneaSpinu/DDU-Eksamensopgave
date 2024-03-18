@@ -60,8 +60,8 @@ class User
     {
         if ($user)
         {
-            $field  = (is_numeric($user)) ? 'uid' : 'username';
-
+            $field  = (is_numeric($user)) ? 'uid' : 'email';
+            
             $data = $this->_db->get('users', array($field, '=', $user));
 
             if ($data->count())
@@ -91,11 +91,11 @@ class User
                     if ($remember)
                     {
                         $hash       = Hash::unique();
-                        $hashCheck  = $this->_db->get('users_session', array('uid', '=', $this->data()->uid));
+                        $hashCheck  = $this->_db->get('user_sessions', array('uid', '=', $this->data()->uid));
 
                         if (!$hashCheck->count())
                         {
-                            $this->_db->insert('users_session', array(
+                            $this->_db->insert('user_sessions', array(
                                 'uid'   => $this->data()->uid,
                                 'hash'      => $hash
                             ));
@@ -118,7 +118,7 @@ class User
 
     public function hasPermission($key)
     {
-        $group = $this->_db->get('groups', array('group_id', '=', $this->data()->groups));
+        $group = $this->_db->get('user_type', array('user_type_ID', '=', $this->data()->user_type_ID));
 
         if  ($group->count())
         {
@@ -140,7 +140,7 @@ class User
 
     public function logout()
     {
-        $this->_db->delete('users_session', array('uid', '=', $this->data()->uid));
+        $this->_db->delete('user_sessions', array('uid', '=', $this->data()->uid));
 
         Session::delete($this->_sessionName);
         Cookie::delete($this->_cookieName);

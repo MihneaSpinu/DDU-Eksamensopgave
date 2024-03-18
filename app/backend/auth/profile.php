@@ -1,11 +1,8 @@
 <?php
-require_once 'app/backend/core/Init.php';
+$name = $user->data()->firstname . " " . $user->data()->lastname;
 
-if (! $user->isLoggedIn())
-{
-     Redirect::to('index.php');
+//Get all subject names from subject_ID's from $all_subjects
+$subject_names = array();
+foreach ($all_subjects as $subject) {
+    $subject_names[] = $db->get('subject', array('subject_ID', '=', $subject->subject_ID))->first()->subject_name;
 }
-
-$data = $user->data();
-
-

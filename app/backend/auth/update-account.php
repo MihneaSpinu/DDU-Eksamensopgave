@@ -6,16 +6,6 @@ if (Input::exists()) {
         $validate = new Validation();
 
         $validation = $validate->check($_POST, array(
-            'name'  => array(
-                'required'  => true,
-                'min'       => 2,
-                'max'       => 50
-            ),
-            'username'  => array(
-                'required'  => true,
-                'min'       => 2,
-                'max'       => 20
-            ),
             'current_password'  => array(
                 'required'  => true,
                 'min'       => 6,
@@ -37,18 +27,14 @@ if (Input::exists()) {
 
         if ($validation->passed()) {
             try {
-                $user->update(array(
-                    'name'  => Input::get('name'),
-                    'username'  => Input::get('username'),
-                ));
 
                 if ($validation->optional()) {
                     $user->update(array(
                         'password'  => Password::hash(Input::get('new_password'))
                     ));
                 }
-                Session::flash('update-success', 'Profile successfully updated!');
-                Redirect::to('index.php');
+                Session::flash('update-success', 'Password er blevet opdateret!');
+                Redirect::to('/');
             } catch (Exception $e) {
                 die($e->getMessage());
             }

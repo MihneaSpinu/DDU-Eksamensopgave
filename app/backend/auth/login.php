@@ -1,5 +1,7 @@
 <?php
-require_once 'app/backend/core/Init.php';
+if ($user->isLoggedIn()) {
+    Redirect::to('/');
+}
 
 if (Input::exists()) {
     if (Token::check(Input::get('csrf_token'))) {
@@ -20,7 +22,7 @@ if (Input::exists()) {
             $login      = $user->login(Input::get('username'), Input::get('password'), $remember);
             if ($login) {
                 Session::flash('login-success', 'You have successfully logged in!');
-                Redirect::to('forum.php');
+                Redirect::to('/');
             } else {
                 echo '<div class="alert alert-danger"><strong></strong>Incorrect Credentials! Please try again...</div>';
             }

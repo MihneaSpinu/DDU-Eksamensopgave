@@ -6,5 +6,7 @@ require_once 'app/backend/core/Helpers.php';
 
 spl_autoload_register("autoload");
 
+$db = Database::getInstance();
+
 require_once 'app/backend/auth/cookie.php';
 require_once 'app/backend/auth/user.php';
