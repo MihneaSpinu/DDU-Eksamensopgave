@@ -74,9 +74,12 @@
         </ul>
       </div>
       <div class="border-top">
+        <?php
+        //If next homework exists:
+        if ($next_homework) : ?>
         <a>Næste aflevering</a>
         <br>
-        <?php echo $subject->subject_name . ", om " . $time; ?>
+        <?php echo $subject->subject_name . ", om " . $time; endif ?>
       </div>
     </div>
 

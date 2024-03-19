@@ -34,9 +34,4 @@ $first_minute = date('H', strtotime($today_schedule[0]->time)) * 60 + date('i', 
 $last_minute = date('H', strtotime($today_schedule[count($today_schedule) - 1]->time)) * 60 + date('i', strtotime($today_schedule[count($today_schedule) - 1]->time));
 $first_hour = date('H', strtotime($today_schedule[0]->time));
 
-echo "<pre>";
-print_r($today_schedule);
-echo "</pre>";
-
-
 $amount_of_minutes = $last_minute - $first_minute;

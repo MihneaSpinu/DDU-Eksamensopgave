@@ -107,6 +107,9 @@ CREATE TABLE `class`
     FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `class` (`class_ID`, `school_ID`, `class_name`, `class_teacher_ID`) VALUES
+(1, 1, '3UV', 2);
+
 -- --------------------------------------------------------
 
 CREATE TABLE `subject`
@@ -172,6 +175,10 @@ CREATE TABLE `student_class`
     FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `student_class` (`student_ID`, `class_ID`) VALUES
+(1, 1),
+(2, 1);
+
 -- --------------------------------------------------------
 
 CREATE TABLE `subject_class`
@@ -185,6 +192,47 @@ CREATE TABLE `subject_class`
     FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
     FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `subject_class` (`subject_class_ID`, `subject_ID`, `class_ID`, `subject_teacher_ID`) VALUES
+(1, 1, 1, 2),
+(2, 2, 1, 2),
+(3, 3, 1, 2),
+(4, 4, 1, 2),
+(5, 5, 1, 2),
+(6, 6, 1, 2),
+(7, 7, 1, 2),
+(8, 8, 1, 2),
+(9, 9, 1, 2),
+(10, 10, 1, 2),
+(11, 11, 1, 2),
+(12, 12, 1, 2),
+(13, 13, 1, 2),
+(14, 14, 1, 2),
+(15, 15, 1, 2),
+(16, 16, 1, 2),
+(17, 17, 1, 2),
+(18, 18, 1, 2),
+(19, 19, 1, 2),
+(20, 20, 1, 2),
+(21, 21, 1, 2),
+(22, 22, 1, 2),
+(23, 23, 1, 2),
+(24, 24, 1, 2),
+(25, 25, 1, 2),
+(26, 26, 1, 2),
+(27, 27, 1, 2),
+(28, 28, 1, 2),
+(29, 29, 1, 2),
+(30, 30, 1, 2),
+(31, 31, 1, 2),
+(32, 32, 1, 2),
+(33, 33, 1, 2),
+(34, 34, 1, 2),
+(35, 35, 1, 2),
+(36, 36, 1, 2),
+(37, 37, 1, 2),
+(38, 38, 1, 2),
+(39, 39, 1, 2);
 
 -- -------------------------------------------------------
 
@@ -230,6 +278,14 @@ BEGIN
 END//
 DELIMITER ;
 
+INSERT INTO `subject_class_sections` (`section_ID`, `subject_class_ID`, `section_name`, `parent_section_ID`) VALUES
+(1, 1, 'Lektion 1', NULL),
+(2, 1, 'Lektion 2', NULL),
+(3, 1, 'Lektion 3', NULL),
+(4, 1, 'Lektion 4', NULL),
+(5, 1, 'Lektion 5', NULL),
+(6, 1, 'Lektion 6', NULL);
+
 -- --------------------------------------------------------
 
 CREATE TABLE `homework`
@@ -251,6 +307,14 @@ CREATE TABLE `homework`
     FOREIGN KEY (`section_ID`) REFERENCES `subject_class_sections` (`section_ID`),
     FOREIGN KEY (`assigned_by`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `homework` (`homework_ID`, `section_ID`, `homework_title`, `homework_description`, `due_date`, `immersion_time`, `assigned_by`) VALUES
+(1, 1, 'Lektie 1', 'Lav opgaverne 1-5', '2024-03-12 08:00:00', 60, 2),
+(2, 1, 'Lektie 2', 'Lav opgaverne 6-10', '2024-03-12 08:00:00', 60, 2),
+(3, 1, 'Lektie 3', 'Lav opgaverne 11-15', '2024-03-12 08:00:00', 60, 2),
+(4, 1, 'Lektie 4', 'Lav opgaverne 16-20', '2024-03-12 08:00:00', 60, 2),
+(5, 1, 'Lektie 5', 'Lav opgaverne 21-25', '2024-03-12 08:00:00', 60, 2),
+(6, 1, 'Lektie 6', 'Lav opgaverne 26-30', '2024-03-12 08:00:00', 60, 2);
 
 -- --------------------------------------------------------
 
@@ -331,7 +395,6 @@ INSERT INTO `schedule` (`schedule_ID`, `subject_class_ID`, `date`, `period`, `ro
 (5, 1, '2024-03-12 13:00:00', 1, 'A1', 'Lektion 5', 'Lav lektierne til næste gang'),
 (6, 1, '2024-03-12 14:00:00', 1, 'A1', 'Lektion 6', 'Lav lektierne til næste gang');
 
-
 -- --------------------------------------------------------
 
 CREATE TABLE `absence`
@@ -366,6 +429,7 @@ CREATE TABLE `messages`
     `message_ID` INT(11) NOT NULL AUTO_INCREMENT,
     `from_uid` INT(11) NOT NULL,
     `to_uid` INT(11) NOT NULL,
+    `subject` VARCHAR(255) NOT NULL,
     `message` VARCHAR(255) NOT NULL,
     `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -373,3 +437,21 @@ CREATE TABLE `messages`
     FOREIGN KEY (`from_uid`) REFERENCES `users` (`uid`),
     FOREIGN KEY (`to_uid`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `messages` (`message_ID`, `from_uid`, `to_uid`, `subject`, `message`) VALUES
+(1, 1, 2, 'Hej Torsten', 'Jeg har et spørgsmål til lektie 1');
+
+CREATE TABLE `message_reply`
+(
+    `message_ID` INT(11) NOT NULL,
+    `from_uid` INT(11) NOT NULL,
+    `message` VARCHAR(255) NOT NULL,
+    `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`message_ID`, `from_uid`),
+    FOREIGN KEY (`message_ID`) REFERENCES `messages` (`message_ID`),
+    FOREIGN KEY (`from_uid`) REFERENCES `users` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `message_reply` (`message_ID`, `from_uid`, `message`) VALUES
+(1, 2, 'Hej Gunnar, hvad er dit spørgsmål?');

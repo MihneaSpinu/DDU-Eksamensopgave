@@ -78,20 +78,28 @@ usort($all_homework, function ($a, $b) {
     return strtotime($a->due_date) - strtotime($b->due_date);
 });
 
-$next_homework = $all_homework[0];
-$section = $db->get('subject_class_sections', array('section_ID', '=', $next_homework->section_ID))->first();
-$subject_class = $db->get('subject_class', array('subject_class_ID', '=', $section->subject_class_ID))->first();
-$subject = $db->get('subject', array('subject_ID', '=', $subject_class->subject_ID))->first();
-
-//echo amount of days until due date. If more than 1 day, print days, else print hours,minutes 
-$today = date('Y-m-d');
-$due_date = $next_homework->due_date;
-$diff = abs(strtotime($due_date) - strtotime($today));
-
-$days = floor($diff / (60 * 60 * 24));
-$hours = floor($diff / (60 * 60));
-if ($days > 1) {
-    $time = $days . " dage";
+//Get the next homework, if it exists
+if (count($all_homework) > 0) {
+    $next_homework = $all_homework[0];
 } else {
-    $time = $hours . " timer";
+    $next_homework = null;
+}
+
+if ($next_homework) {
+    $section = $db->get('subject_class_sections', array('section_ID', '=', $next_homework->section_ID))->first();
+    $subject_class = $db->get('subject_class', array('subject_class_ID', '=', $section->subject_class_ID))->first();
+    $subject = $db->get('subject', array('subject_ID', '=', $subject_class->subject_ID))->first();
+
+    //echo amount of days until due date. If more than 1 day, print days, else print hours,minutes 
+    $today = date('Y-m-d');
+    $due_date = $next_homework->due_date;
+    $diff = abs(strtotime($due_date) - strtotime($today));
+
+    $days = floor($diff / (60 * 60 * 24));
+    $hours = floor($diff / (60 * 60));
+    if ($days > 1) {
+        $time = $days . " dage";
+    } else {
+        $time = $hours . " timer";
+    }
 }
