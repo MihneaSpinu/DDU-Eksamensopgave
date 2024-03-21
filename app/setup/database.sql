@@ -63,8 +63,8 @@ CREATE TABLE `users`
     `uid` INT(11) NOT NULL AUTO_INCREMENT,
     `user_type_ID` INT(11) NOT NULL,
     `school_ID` INT(11) NOT NULL,
-    `firstname` VARCHAR(255) NOT NULL,
-    `lastname` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `initials` VARCHAR(255) NOT NULL DEFAULT '',
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `date_created` DATE NOT NULL,
@@ -75,9 +75,11 @@ CREATE TABLE `users`
     FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `users` (`uid`, `user_type_ID`, `school_ID`, `firstname`, `lastname`, `email`, `password`, `date_created`) VALUES
-(1, 1, 1, 'Gunnar Máni', 'Jóhannsson', 'gunnarmani@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
-(2, 2, 1, 'Torsten Skov', 'Fix', 'torstenskov@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21');
+INSERT INTO `users` (`uid`, `user_type_ID`, `school_ID`, `name`, `initials`, `email`, `password`, `date_created`) VALUES
+(1, 1, 1, 'Gunnar Máni Jóhannsson', 'GMJ', 'gunnarmani@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
+(2, 2, 1, 'Torsten Skov Fix', 'thfi' 'torstenskov@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
+(3, 2, 1, 'Lars Larsen', 'LL', 'larslarsen@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
+(4, 1, 1, 'Mads Madsen', 'MM', 'madsmadsen@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21');
 
 -- --------------------------------------------------------
 

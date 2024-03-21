@@ -1,14 +1,5 @@
 <?php
-$name = $user->data()->firstname . " " . $user->data()->lastname;
-$words = explode(" ", $name);
-$initials = "";
-foreach ($words as $word) {
-    $initials .= $word[0];
-}
-$user_initials = substr($initials, 0, 2) . substr($initials, -1);
-
 $student_classes = $db->get('student_class', array('student_ID', '=', $user->data()->uid))->results();
-// $all_tables = array();
 $all_classes = array();
 $all_subjects = array();
 $all_sections = array();

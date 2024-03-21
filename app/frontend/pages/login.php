@@ -14,10 +14,6 @@
           <div class="form-group">
             <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
           </div>
-          <div class="form-group form-check">
-            <input type="checkbox" name="remember" id="remember" class="form-check-input">
-            <label for="remember" class="form-check-label">Remember Me</label>
-          </div>
           <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
           <input type="submit" value="Log In" class="btn btn-primary">
         </form>
