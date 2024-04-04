@@ -1,85 +1,75 @@
-<div class="calendar" style="height:500px;overflow:auto;">
-    <div class="timeline">
-        <div class="spacer"></div>
-        <?php
-        //For each hour in the day, print a line 00:00, 01:00, 02:00 etc.
-        for ($i = 0; $i < 24; $i++) {
-            echo "<div class='hour'>" . str_pad($i, 2, "0", STR_PAD_LEFT) . ":00</div>";
-        }
+<style>
+    .schedule {
+        display: grid;
+        grid-template-rows: repeat(660, 1px);
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        position: relative;
+    }
 
-        ?>
-    </div>
-    <div class="days">
-        <?php
-        $days = array('Mon', 'Tues', 'Wed', 'Thurs', 'Fri');
-        $today = date('D');
-        $today = array_search($today, $days);
-        for ($i = 0; $i < 5; $i++) {
-            $day = $days[($today + $i) % 5];
-            $date = date('d', strtotime("monday this week +$i days"));
+    .timestamps,
+    .events {
+        display: grid;
+        grid-auto-rows: 1px;
+        position: relative;
+    }
 
-            echo "<div class='day $day'>";
-            echo "<div class='date'>";
-            echo "<p class='date-num'>$date</p>";
-            echo "<p class='date-day'>$day</p>";
-            echo "</div>";
-            echo "<div class='events'>";
-            foreach ($schedule as $s) {
-                if (date('d', strtotime($s->date)) == $date) {
-                    echo "<div class='event' style='grid-row-start: " . date('H', strtotime($s->date)) + 1 . "; grid-row-end: " . date('H', strtotime($s->date . " + $s->period hours")) + 1 . ";'>";
+    .timestamp {
+        text-align: center;
+    }
 
-                    echo "<p class='title'>$s->subject_name</p>";
-                    //Print time fx 10:00 - 12:00. Date is written as 2021-09-13 13:10:56, but only want to print 10:00 - 10:00 + period
-                    echo "<p class='time'>" . date('H:i', strtotime($s->date)) . " - " . date('H:i', strtotime($s->date . " +$s->period hours")) . "</p>";
+    .event {
+        background-color: #e9ecef;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
 
-                    echo "<p class='room'>$s->room</p>";
-                    echo "</div>";
-                }
-            }
-            echo "</div>";
-            echo "</div>";
-        }
+    .events {
+        display: grid;
+        grid-template-columns: 60px 1fr;
+    }
+</style>
 
-        ?>
-    </div>
-</div>
-
-<div class="container">
-    <!-- Create calendar using table instead. Put classes by hours and minutes, not only hours -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">Time</th>
-                <th scope="col">Monday</th>
-                <th scope="col">Tuesday</th>
-                <th scope="col">Wednesday</th>
-                <th scope="col">Thursday</th>
-                <th scope="col">Friday</th>
-            </tr>
-        </thead>
-        <div style="height: 500px; overflow: auto;">
-            <tbody>
-                <?php
-                for ($i = 0; $i < 24; $i++) {
-                    echo "<tr>";
-                    echo "<td>" . str_pad($i, 2, "0", STR_PAD_LEFT) . ":00</td>";
-                    for ($j = 0; $j < 5; $j++) {
-                        echo "<td>";
-                        foreach ($schedule as $s) {
-                            if (date('H', strtotime($s->date)) == $i && date('D', strtotime($s->date)) == $days[$j]) {
-                                echo "<div class='event'>";
-                                echo "<p class='title'>$s->subject_name</p>";
-                                echo "<p class='time'>" . date('H:i', strtotime($s->date)) . " - " . date('H:i', strtotime($s->date . " +$s->period hours")) . "</p>";
-                                echo "<p class='room'>$s->room</p>";
-                                echo "</div>";
-                            }
+<div class="container mt-5">
+    <div class="row">
+        <?php if ($schedule) : ?>
+            <div class="col-md-8 offset-md-2">
+                <div class="schedule">
+                    <!-- Timestamps -->
+                    <div class="timestamps" style="grid-column: 1;">
+                        <?php
+                        for ($i = $first_hour; $i < $last_hour; $i++) {
+                            echo "<div class='timestamp border-top' style='grid-row: " . $i * 60 - ($first_hour * 60) . " / " . ($i + 1) * 60 - ($first_hour * 60) . ";'>" . date('H:i', strtotime('00:00') + $i * 60 * 60) . "</div>";
                         }
-                        echo "</td>";
-                    }
-                    echo "</tr>";
-                }
-                ?>
-            </tbody>
-        </div>
-    </table>
+                        ?>
+                    </div>
+                    <?php $i = 0;
+                    foreach ($week_schedule as $day) :
+                        $i++; ?>
+                        <div class="events border-left" style="grid-row: 1/660; grid-column: <?php echo $i + 1; ?>">
+                            Day
+                            <?php foreach ($day as $event) : ?>
+                                <div class='event ml-2 py-2' style='grid-row: <?php echo $event->first_minute - ($first_hour * 60) . "/" . $event->last_minute - ($first_hour * 60); ?>;'>
+                                    <div class="row px-2">
+                                        <div class="col-8">
+                                            <h6><?php echo $event->subject_name; ?></h6>
+                                            <a><?php echo $event->time . " - " . date('H:i', strtotime($event->time) + $event->period * 60 * 60); ?></a>
+                                            <a><?php echo $event->teacher; ?></a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a>Room: <?php echo $event->room; ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else : ?>
+                No schedule
+            <?php endif; ?>
+            </div>
+    </div>
 </div>

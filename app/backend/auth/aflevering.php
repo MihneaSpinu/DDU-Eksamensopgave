@@ -16,9 +16,9 @@ if (!in_array($section, $all_sections)) {
     Redirect::to('/');
 }
 
-$subject = $db->get('subject_class', array('subject_class_ID', '=', $section->subject_class_ID))->first();
-$subject->subject_name = $db->get('subject', array('subject_ID', '=', $subject->subject_ID))->first()->subject_name;
-$assigned_by = $db->get('users', array('uid', '=', $homework->assigned_by))->first()->firstname . " " . $db->get('users', array('uid', '=', $homework->assigned_by))->first()->lastname;
+$subject_class = $db->get('subject_class', array('subject_class_ID', '=', $section->subject_class_ID))->first();
+$subject = $db->get('subject', array('subject_ID', '=', $subject_class->subject_ID))->first();
+$assigned_by = $db->get('users', array('uid', '=', $homework->assigned_by))->first();
 
 $submitted = $db->get('submissions', array('homework_ID', '=', $homework_id), array('student_ID', '=', $user->data()->uid))->count() ? true : false;
 if ($submitted) {

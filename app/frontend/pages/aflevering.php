@@ -14,9 +14,9 @@
                         <input class="form-control" type="file" name="file" id="file" required>
                     </div>
                     <p name="homework_id"><?php echo $homework->homework_ID; ?></p>
-                    <p name="student_id"><?php echo $user->data()->firstname; ?></p>
+                    <p name="student_id"><?php echo $user->data()->name; ?></p>
                     <p name="submitted_at"><?php echo date('Y-m-d H:i:s'); ?></p>
-                    <p name="assigned_by"><?php echo $assigned_by; ?></p>
+                    <p name="assigned_by"><?php echo $assigned_by->name; ?></p>
                     <p name="due_date">Skal afleveres: <?php echo $homework->due_date; ?></p>
                     <p name="subject_name"><?php echo $subject->subject_name; ?></p>
                     <p name="section_name"><?php echo $section->section_name; ?></p>

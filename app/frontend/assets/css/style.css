@@ -16,6 +16,10 @@ a {
   text-decoration: none;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
 svg {
   max-width: 100%;
   height: auto;
@@ -59,6 +63,31 @@ svg {
   background-color: #DCEAFF !important;
 }
 
+.bg-offwhite {
+  background-color: #F1F1F1 !important;
+}
+
+.bg-gray {
+  background-color: #999999 !important;
+}
+
+.bg-red {
+  background-color: #FF0000 !important;
+}
+
+.bg-green {
+  background-color: #00FF00 !important;
+}
+
+.bg-yellow {
+  background-color: #FFFF00 !important;
+}
+
+.col-1 {
+  max-width: 10% !important;
+  flex: 10% !important;
+}
+
 .border-linear {
   max-width: 250px;
   padding: 1rem;
@@ -71,8 +100,10 @@ svg {
   border-radius: 8px !important;
 }
 
-.opacity-60 {
-  opacity: 0.6;
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* The switch - the box around the slider */
@@ -127,4 +158,35 @@ svg {
 
 .switch input:checked+.slider:before {
   transform: translateX(1em);
+}
+
+.timestamps,
+.events {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1px;
+}
+
+.timestamp {
+  text-align: center;
+}
+
+.event {
+  background-color: #e9ecef;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.card {
+  border-radius: 8px;
+  /* Shadow on bottom */
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.1);
+  background-color: #F5F5F5;
+}
+
+.homework-container {
+  max-height: 438px; /* Adjust the height as per your requirement */
+  position: relative;
 }
