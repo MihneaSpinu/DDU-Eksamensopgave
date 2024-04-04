@@ -1,6 +1,13 @@
 <?php
-
-$submissions = $db->get('submissions', array('student_ID', '=', $user->data()->uid))->results();
+$dage = array(
+    'Mon' => 'Man',
+    'Tue' => 'Tir',
+    'Wed' => 'Ons',
+    'Thu' => 'Tor',
+    'Fri' => 'Fre',
+    'Sat' => 'Lør',
+    'Sun' => 'Søn'
+);
 
 $schedule = array();
 foreach ($all_subjects as $subject) {
@@ -11,10 +18,10 @@ foreach ($all_subjects as $subject) {
     }
 }
 
-$today = date('D');
+$today = "2024-03-27";
 $today_schedule = array();
 foreach ($schedule as $s) {
-    if (date('D', strtotime($s->date)) == $today) {
+    if (date('Y-m-d', strtotime($s->date)) == $today) {
         //Add $s to $today_schedule
         $today_schedule[] = $s;
     }
@@ -26,11 +33,20 @@ foreach ($schedule as $s) {
     $teacher = $db->get('subject_class', array('subject_class_ID', '=', $s->subject_class_ID))->first()->subject_teacher_ID;
     $s->teacher = $db->get('users', array('uid', '=', $teacher))->first()->initials;
 }
-
 //Sort by time
 usort($today_schedule, function ($a, $b) {
     return strtotime($a->time) - strtotime($b->time);
 });
 
-$first_hour = floor($today_schedule[0]->first_minute) / 60;
-$last_hour = ceil($today_schedule[count($today_schedule) - 1]->last_minute) / 60;
+if (count($today_schedule) > 0) {
+    $first_hour = floor($today_schedule[0]->first_minute / 60);
+    $last_hour = ceil($today_schedule[count($today_schedule) - 1]->last_minute) / 60;
+}
+
+//Count amount of homework that has been submitted
+$submitted_homework = 0;
+foreach ($all_homework as $homework) {
+    if ($homework->submitted || date('Y-m-d H:i:s') > $homework->due_date) {
+        $submitted_homework++;
+    }
+}

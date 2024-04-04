@@ -77,7 +77,7 @@ CREATE TABLE `users`
 
 INSERT INTO `users` (`uid`, `user_type_ID`, `school_ID`, `name`, `initials`, `email`, `password`, `date_created`) VALUES
 (1, 1, 1, 'Gunnar Máni Jóhannsson', 'GMJ', 'gunnarmani@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
-(2, 2, 1, 'Torsten Skov Fix', 'thfi' 'torstenskov@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
+(2, 2, 1, 'Torsten Skov Fix', 'thfi', 'torstenskov@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
 (3, 2, 1, 'Lars Larsen', 'LL', 'larslarsen@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21'),
 (4, 1, 1, 'Mads Madsen', 'MM', 'madsmadsen@mail.hansenberg.dk', '$2y$10$61NSo7BizpcDsMOn5lfWeezE9nvAgGpf3JpSYLLaxJtMF9h42jCAG', '2024-02-21');
 
@@ -278,15 +278,19 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
     END IF;
 END//
-DELIMITER ;
 
-INSERT INTO `subject_class_sections` (`section_ID`, `subject_class_ID`, `section_name`, `parent_section_ID`) VALUES
-(1, 1, 'Lektion 1', NULL),
-(2, 1, 'Lektion 2', NULL),
-(3, 1, 'Lektion 3', NULL),
-(4, 1, 'Lektion 4', NULL),
-(5, 1, 'Lektion 5', NULL),
-(6, 1, 'Lektion 6', NULL);
+CREATE TRIGGER `create_section_on_new_subject` AFTER INSERT ON `subject_class`
+FOR EACH ROW
+BEGIN
+    INSERT INTO `subject_class_sections` (`subject_class_ID`, `section_name`) VALUES (NEW.subject_class_ID, (SELECT `subject_name` FROM `subject` WHERE `subject_ID` = NEW.subject_ID));
+END//
+
+CREATE TRIGGER `delete_section_on_deleted_subject` AFTER DELETE ON `subject_class`
+FOR EACH ROW
+BEGIN
+    DELETE FROM `subject_class_sections` WHERE `subject_class_ID` = OLD.subject_class_ID;
+END//
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -304,19 +308,20 @@ CREATE TABLE `homework`
     `hidden` TINYINT(1) NOT NULL DEFAULT 0,
     `homework_file` VARCHAR(255),
     `assigned_by` INT(11) NOT NULL,
+    `important` TINYINT(1) NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`homework_ID`, `section_ID`),
     FOREIGN KEY (`section_ID`) REFERENCES `subject_class_sections` (`section_ID`),
     FOREIGN KEY (`assigned_by`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `homework` (`homework_ID`, `section_ID`, `homework_title`, `homework_description`, `due_date`, `immersion_time`, `assigned_by`) VALUES
-(1, 1, 'Lektie 1', 'Lav opgaverne 1-5', '2024-03-12 08:00:00', 60, 2),
-(2, 1, 'Lektie 2', 'Lav opgaverne 6-10', '2024-03-12 08:00:00', 60, 2),
-(3, 1, 'Lektie 3', 'Lav opgaverne 11-15', '2024-03-12 08:00:00', 60, 2),
-(4, 1, 'Lektie 4', 'Lav opgaverne 16-20', '2024-03-12 08:00:00', 60, 2),
-(5, 1, 'Lektie 5', 'Lav opgaverne 21-25', '2024-03-12 08:00:00', 60, 2),
-(6, 1, 'Lektie 6', 'Lav opgaverne 26-30', '2024-03-12 08:00:00', 60, 2);
+INSERT INTO `homework` (`homework_ID`, `section_ID`, `homework_title`, `homework_description`, `due_date`, `immersion_time`, `assigned_by`, `important`) VALUES
+(1, 1, 'Lektie 1', 'Lav opgaverne 1-5', '2024-03-12 08:00:00', 60, 2, 1),
+(2, 1, 'Lektie 2', 'Lav opgaverne 6-10', '2024-03-12 08:00:00', 60, 2, 0),
+(3, 1, 'Lektie 3', 'Lav opgaverne 11-15', '2024-03-12 08:00:00', 60, 2, 1),
+(4, 1, 'Lektie 4', 'Lav opgaverne 16-20', '2024-03-12 08:00:00', 60, 2, 0),
+(5, 1, 'Lektie 5', 'Lav opgaverne 21-25', '2024-03-12 08:00:00', 60, 2, 1),
+(6, 1, 'Lektie 6', 'Lav opgaverne 26-30', '2024-03-12 08:00:00', 60, 2, 0);
 
 -- --------------------------------------------------------
 
@@ -367,7 +372,6 @@ CREATE TABLE `section_files`
 (
     `section_ID` INT(11) NOT NULL,
     `file_name` VARCHAR(255) NOT NULL,
-    `file_path` VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (`section_ID`),
     FOREIGN KEY (`section_ID`) REFERENCES `subject_class_sections` (`section_ID`)
@@ -442,6 +446,8 @@ CREATE TABLE `messages`
 
 INSERT INTO `messages` (`message_ID`, `from_uid`, `to_uid`, `subject`, `message`) VALUES
 (1, 1, 2, 'Hej Torsten', 'Jeg har et spørgsmål til lektie 1');
+
+-- --------------------------------------------------------
 
 CREATE TABLE `message_reply`
 (
