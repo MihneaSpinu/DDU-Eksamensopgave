@@ -1,7 +1,7 @@
 <div class="row">
-  <div class="col-8">
+  <div class="col-8 mx-auto">
     <div class="row">
-      <div class="col pr-0">
+      <div class="col-8 col-lg-6 col-md-12 pr-0 mx-auto">
         <h3 class="border-bottom pl-3">Lektier</h3>
         <div class="homework-container pr-2" style="<?php echo count($all_homework) - $submitted_homework > 5 ? 'overflow-y: auto;' : ''; ?>">
           <?php foreach ($all_homework as $homework) : ?>
@@ -52,7 +52,7 @@
           <?php endforeach; ?>
         </div>
       </div>
-      <div class="col afleveret">
+      <div class="col-12 col-lg-6 col-md-12 col-sm-12 mx-auto">
         <h3 class="border-bottom pl-3">Status</h3>
         <div class="homework-container pr-2" style="<?php echo $submitted_homework > 5 ? 'overflow-y: auto;' : ''; ?>">
           <?php
@@ -119,11 +119,11 @@
       min-height: 420px;
     }
   </style>
-  <div class="col col-lg-4 col-md-6 mx-auto">
+  <div class="col col-lg-4 col-md-8 mx-auto">
     <div class="row">
-      <?php if ($today_schedule) : ?>
-        <h3 class="border-bottom pl-3 w-100"><?php echo $dage[date('D', strtotime($today))] . " " . date('d M'); ?></h3>
-        <div class="schedule card pb-3">
+      <h3 class="border-bottom pl-3 w-100"><?php echo $dage[date('D', strtotime($today))] . " " . date('d M'); ?></h3>
+      <div class="schedule card pb-3">
+        <?php if ($today_schedule) : ?>
           <!-- Timestamps
           <div class="timestamps">
             <?php
@@ -136,7 +136,8 @@
           <div class="events px-3">
             <?php foreach ($today_schedule as $event) : ?>
               <div class='event py-2' style='grid-row: <?php echo $event->first_minute - $first_hour * 60; ?>/<?php echo $event->last_minute - $first_hour * 60; ?>;
-              background-color: <?php echo isset($event->color) ? $event->color : "#e9ecef"; ?>;'>
+              background-color: <?php echo isset($event->color) ? $event->color : "#e9ecef"; ?>;
+              border-color: <?php echo isset($event->color) ? darken($event->color, 30) : "#e9ecef"; ?>;'>
                 <div class="row px-2">
                   <div class="col-8">
                     <h6><?php echo $event->subject_name; ?></h6>
@@ -150,8 +151,8 @@
               </div>
             <?php endforeach; ?>
           </div>
-        </div>
-      <?php endif; ?>
+        <?php endif; ?>
+      </div>
     </div>
   </div>
 

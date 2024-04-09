@@ -26,6 +26,12 @@ svg {
   /* Optional */
   display: block;
 }
+
+.btn {
+  background-color: #4267C7;
+  color: white;
+}
+
 .vh-100 {
   height: 100vh;
 }
@@ -186,7 +192,30 @@ svg {
   background-color: #F5F5F5;
 }
 
+/* .card-title {
+  background-color: #FEF7FF;
+  border-radius: 8px 8px 0 0;
+} */
+
 .homework-container {
   max-height: 438px; /* Adjust the height as per your requirement */
   position: relative;
+}
+
+.dropdown-toggle::after {
+  display:none;
+}
+
+.message-card {
+  background-color: #FEF7FF;
+  transition: background-color 0.3s ease;
+}
+
+.message-card:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Darken effect on hover */
+  cursor: pointer;
+}
+
+.message-card.selected {
+  background-color: rgba(0, 0, 0, 0.1); /* Darken effect when selected */
 }

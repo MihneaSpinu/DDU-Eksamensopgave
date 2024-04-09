@@ -119,51 +119,56 @@ CREATE TABLE `subject`
     `subject_ID` INT(11) NOT NULL AUTO_INCREMENT,
     `school_ID` INT(11) NOT NULL,
     `subject_name` VARCHAR(255) NOT NULL,
+    `subject_color` VARCHAR(255) NOT NULL DEFAULT '#0e9ecef',
 
     PRIMARY KEY (`subject_ID`, `school_ID`),
     FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`) VALUES
-(1, 1, 'Matematik C'),
-(2, 1, 'Matematik B'),
-(3, 1, 'Matematik A'),
-(4, 1, 'Dansk C'),
-(5, 1, 'Dansk B'),
-(6, 1, 'Dansk A'),
-(7, 1, 'Engelsk C'),
-(8, 1, 'Engelsk B'),
-(9, 1, 'Engelsk A'),
-(10, 1, 'Idehistorie C'),
-(11, 1, 'Idehistorie B'),
-(12, 1, 'Idehistorie A'),
-(13, 1, 'Programmering C'),
-(14, 1, 'Programmering B'),
-(15, 1, 'Programmering A'),
-(16, 1, 'Fysik C'),
-(17, 1, 'Fysik B'),
-(18, 1, 'Fysik A'),
-(19, 1, 'Kemi C'),
-(20, 1, 'Kemi B'),
-(21, 1, 'Kemi A'),
-(22, 1, 'Biologi C'),
-(23, 1, 'Biologi B'),
-(24, 1, 'Biologi A'),
-(25, 1, 'Samfundsfag C'),
-(26, 1, 'Samfundsfag B'),
-(27, 1, 'Samfundsfag A'),
-(28, 1, 'Idræt C'),
-(29, 1, 'Idræt B'),
-(30, 1, 'Idræt A'),
-(31, 1, 'Teknologi C'),
-(32, 1, 'Teknologi B'),
-(33, 1, 'Teknologi A'),
-(34, 1, 'Teknikfag (DDU) A'),
-(35, 1, 'Teknikfag (cityg og hyg) A'),
-(36, 1, 'Teknikfag (Process) A'),
-(37, 1, 'Kommunikation og IT C'),
-(38, 1, 'Kommunikation og IT B'),
-(39, 1, 'Kommunikation og IT A');
+INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`, `subject_color`) VALUES
+(1, 1, 'Matematik C', '#FFE3C9'), -- Light orange
+(2, 1, 'Matematik B', '#FFE3C9'), -- Light orange
+(3, 1, 'Matematik A', '#FFE3C9'), -- Light orange
+(4, 1, 'Dansk C', '#CCFFF6'), -- Light blue
+(5, 1, 'Dansk B', '#CCFFF6'), -- Light blue
+(6, 1, 'Dansk A', '#CCFFF6'), -- Light blue
+(7, 1, 'Engelsk C', '#C8FFCD'), -- Light green
+(8, 1, 'Engelsk B', '#C8FFCD'), -- Light green
+(9, 1, 'Engelsk A', '#C8FFCD'), -- Light green
+(10, 1, 'Idehistorie C', '#FFD9CC'), -- Light peach
+(11, 1, 'Idehistorie B', '#F6CCFF'), -- Light purple
+(12, 1, 'Idehistorie A', '#E3C9FF'), -- Light lavender
+(13, 1, 'Programmering C', '#CDFFEC'), -- Light mint
+(14, 1, 'Programmering B', '#CDFFEC'), -- Light mint
+(15, 1, 'Programmering A', '#CDFFEC'), -- Light mint
+(16, 1, 'Fysik C', '#FFD9E3'), -- Light rose
+(17, 1, 'Fysik B', '#FFD9E3'), -- Light rose
+(18, 1, 'Fysik A', '#FFD9E3'), -- Light rose
+(19, 1, 'Kemi C', '#CDF6FF'), -- Light cyan
+(20, 1, 'Kemi B', '#CDF6FF'), -- Light cyan
+(21, 1, 'Kemi A', '#CDF6FF'), -- Light cyan
+(22, 1, 'Biologi C', '#ECFFD9'), -- Light lime
+(23, 1, 'Biologi B', '#ECFFD9'), -- Light lime
+(24, 1, 'Biologi A', '#ECFFD9'), -- Light lime
+(25, 1, 'Samfundsfag C', '#FFE3C9'), -- Light orange
+(26, 1, 'Samfundsfag B', '#FFE3C9'), -- Light orange
+(27, 1, 'Samfundsfag A', '#FFE3C9'), -- Light orange
+(28, 1, 'Idræt C', '#CCFFF6'), -- Light blue
+(29, 1, 'Idræt B', '#CCFFF6'), -- Light blue
+(30, 1, 'Idræt A', '#CCFFF6'), -- Light blue
+(31, 1, 'Teknologi C', '#C8FFCD'), -- Light green
+(32, 1, 'Teknologi B', '#C8FFCD'), -- Light green
+(33, 1, 'Teknologi A', '#C8FFCD'), -- Light green
+(34, 1, 'Teknikfag (DDU) A', '#FFD9CC'), -- Light peach
+(35, 1, 'Teknikfag (cityg og hyg) A', '#FFD9CC'), -- Light peach
+(36, 1, 'Teknikfag (Process) A', '#FFD9CC'), -- Light peach
+(37, 1, 'Kommunikation og IT C', '#F6CCFF'), -- Light purple
+(38, 1, 'Kommunikation og IT B', '#F6CCFF'), -- Light purple
+(39, 1, 'Kommunikation og IT A', '#F6CCFF'), -- Light purple
+(40, 1, 'Geografi C', '#E3C9FF'), -- Light lavender
+(41, 1, 'Historie C', '#E3C9FF'), -- Light lavender
+(42, 1, 'Psykologi B', '#E3C9FF'); -- Light lavender
+
 
 -- --------------------------------------------------------
 
@@ -190,7 +195,7 @@ CREATE TABLE `subject_class`
     `class_ID` INT(11) NOT NULL,  
     `subject_teacher_ID` INT(11) NOT NULL,
 
-    PRIMARY KEY (`subject_class_ID`, `subject_ID`),
+    PRIMARY KEY (`subject_class_ID`, `subject_ID`, `class_ID`),
     FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
     FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -434,18 +439,37 @@ CREATE TABLE `messages`
 (
     `message_ID` INT(11) NOT NULL AUTO_INCREMENT,
     `from_uid` INT(11) NOT NULL,
-    `to_uid` INT(11) NOT NULL,
     `subject` VARCHAR(255) NOT NULL,
     `message` VARCHAR(255) NOT NULL,
     `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`message_ID`),
-    FOREIGN KEY (`from_uid`) REFERENCES `users` (`uid`),
+    FOREIGN KEY (`from_uid`) REFERENCES `users` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `messages` (`message_ID`, `from_uid`, `subject`, `message`) VALUES
+(1, 1, 'Hej Torsten', 'Jeg har et spørgsmål til lektie 1'),
+(2, 2, 'Vigtig besked', 'Husk at aflevere lektie 2 inden fredag.'),
+(3, 3, 'Godmorgen!', 'Håber du får en god dag!'),
+(4, 4, 'Afsked', 'Vi ses i morgen!');
+
+-- --------------------------------------------------------
+
+CREATE TABLE `message_to_users`
+(
+    `message_ID` INT(11) NOT NULL,
+    `to_uid` INT(11) NOT NULL,
+
+    PRIMARY KEY (`message_ID`, `to_uid`),
+    FOREIGN KEY (`message_ID`) REFERENCES `messages` (`message_ID`),
     FOREIGN KEY (`to_uid`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `messages` (`message_ID`, `from_uid`, `to_uid`, `subject`, `message`) VALUES
-(1, 1, 2, 'Hej Torsten', 'Jeg har et spørgsmål til lektie 1');
+INSERT INTO `message_to_users` (`message_ID`, `to_uid`) VALUES
+(1, 2),
+(2, 1),
+(3, 1),
+(4, 1);
 
 -- --------------------------------------------------------
 
@@ -456,7 +480,7 @@ CREATE TABLE `message_reply`
     `message` VARCHAR(255) NOT NULL,
     `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (`message_ID`, `from_uid`),
+    PRIMARY KEY (`message_ID`, `from_uid`, `date_created`),
     FOREIGN KEY (`message_ID`) REFERENCES `messages` (`message_ID`),
     FOREIGN KEY (`from_uid`) REFERENCES `users` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

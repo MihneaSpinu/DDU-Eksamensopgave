@@ -1,12 +1,12 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-1 p-3 bg-primary d-flex flex-column vh-100 position-sticky top-0 shadow-lg">
+    <div class="col-2 p-3 bg-primary d-flex flex-column vh-100 position-sticky top-0 shadow-lg d-sm-none d-md-block">
       <div class="mb-4">
         <a href="/" class="mb-md-0 me-md-auto text-decoration-none">
           <img src="<?php echo FRONTEND_ASSET . "images/logo.png" ?>" class="w-100">
         </a>
       </div>
-      <div class="container">
+      <div class="mx-2">
         <div class="border-linear shadow mx-auto">
           <div class="container bg-white rounded">
             <ul class="nav nav-pills flex-column">
@@ -104,5 +104,5 @@
       });
     </script>
 
-    <div class="col-10">
-      <div class="container my-5 h-75">
+    <div class="col-md-10 col-sm-12">
+      <div class="container my-5">
