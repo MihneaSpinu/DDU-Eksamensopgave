@@ -8,7 +8,7 @@
         <!-- Search bar -->
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Søg samtale" aria-label="Søg samtale" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+            <button class="btn btn-primary type="button" id="button-addon2">
                 <i class="fa fa-search"></i>
             </button>
         </div>

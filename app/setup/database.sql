@@ -114,6 +114,22 @@ INSERT INTO `class` (`class_ID`, `school_ID`, `class_name`, `class_teacher_ID`) 
 
 -- --------------------------------------------------------
 
+CREATE TABLE `student_class`
+(
+    `student_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL,
+
+    PRIMARY KEY (`student_ID`, `class_ID`),
+    FOREIGN KEY (`student_ID`) REFERENCES `users` (`uid`),
+    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `student_class` (`student_ID`, `class_ID`) VALUES
+(1, 1),
+(2, 1);
+
+-- --------------------------------------------------------
+
 CREATE TABLE `subject`
 (
     `subject_ID` INT(11) NOT NULL AUTO_INCREMENT,
@@ -124,6 +140,60 @@ CREATE TABLE `subject`
     PRIMARY KEY (`subject_ID`, `school_ID`),
     FOREIGN KEY (`school_ID`) REFERENCES `school` (`school_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+CREATE TABLE `subject_class`
+(
+    `subject_class_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `subject_ID` INT(11) NOT NULL,
+    `class_ID` INT(11) NOT NULL,  
+    `subject_teacher_ID` INT(11) NOT NULL,
+
+    PRIMARY KEY (`subject_class_ID`, `subject_ID`, `class_ID`),
+    FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
+    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- -------------------------------------------------------
+
+CREATE TABLE `subject_class_sections` (
+    `section_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `subject_class_ID` INT(11) NOT NULL,
+    `section_name` VARCHAR(255) NOT NULL,
+    `section_description` TEXT DEFAULT '',
+    `parent_section_ID` INT(11),
+
+    PRIMARY KEY (`section_ID`),
+    FOREIGN KEY (`subject_class_ID`) REFERENCES `subject_class` (`subject_class_ID`),
+    FOREIGN KEY (`parent_section_ID`) REFERENCES `subject_class_sections` (`section_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+DELIMITER //
+CREATE TRIGGER `check_parent_section_ID_trigger` BEFORE INSERT ON `subject_class_sections`
+FOR EACH ROW
+BEGIN
+    IF NEW.parent_section_ID = NEW.section_ID THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
+    END IF;
+END//
+
+CREATE TRIGGER `create_section_on_new_subject` AFTER INSERT ON `subject_class`
+FOR EACH ROW
+BEGIN
+    INSERT INTO `subject_class_sections` (`subject_class_ID`, `section_name`) VALUES (NEW.subject_class_ID, (SELECT `subject_name` FROM `subject` WHERE `subject_ID` = NEW.subject_ID));
+END//
+
+CREATE TRIGGER `delete_section_on_deleted_subject` AFTER DELETE ON `subject_class`
+FOR EACH ROW
+BEGIN
+    DELETE FROM `subject_class_sections` WHERE `subject_class_ID` = OLD.subject_class_ID;
+END//
+DELIMITER ;
+
+-- --------------------------------------------------------
 
 INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`, `subject_color`) VALUES
 (1, 1, 'Matematik C', '#FFE3C9'), -- Light orange
@@ -160,7 +230,7 @@ INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`, `subject_color
 (32, 1, 'Teknologi B', '#C8FFCD'), -- Light green
 (33, 1, 'Teknologi A', '#C8FFCD'), -- Light green
 (34, 1, 'Teknikfag (DDU) A', '#FFD9CC'), -- Light peach
-(35, 1, 'Teknikfag (cityg og hyg) A', '#FFD9CC'), -- Light peach
+(35, 1, 'Teknikfag (byg og hyg) A', '#FFD9CC'), -- Light peach
 (36, 1, 'Teknikfag (Process) A', '#FFD9CC'), -- Light peach
 (37, 1, 'Kommunikation og IT C', '#F6CCFF'), -- Light purple
 (38, 1, 'Kommunikation og IT B', '#F6CCFF'), -- Light purple
@@ -168,37 +238,6 @@ INSERT INTO `subject` (`subject_ID`, `school_ID`, `subject_name`, `subject_color
 (40, 1, 'Geografi C', '#E3C9FF'), -- Light lavender
 (41, 1, 'Historie C', '#E3C9FF'), -- Light lavender
 (42, 1, 'Psykologi B', '#E3C9FF'); -- Light lavender
-
-
--- --------------------------------------------------------
-
-CREATE TABLE `student_class`
-(
-    `student_ID` INT(11) NOT NULL,
-    `class_ID` INT(11) NOT NULL,
-
-    PRIMARY KEY (`student_ID`, `class_ID`),
-    FOREIGN KEY (`student_ID`) REFERENCES `users` (`uid`),
-    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `student_class` (`student_ID`, `class_ID`) VALUES
-(1, 1),
-(2, 1);
-
--- --------------------------------------------------------
-
-CREATE TABLE `subject_class`
-(
-    `subject_class_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `subject_ID` INT(11) NOT NULL,
-    `class_ID` INT(11) NOT NULL,  
-    `subject_teacher_ID` INT(11) NOT NULL,
-
-    PRIMARY KEY (`subject_class_ID`, `subject_ID`, `class_ID`),
-    FOREIGN KEY (`subject_ID`) REFERENCES `subject` (`subject_ID`),
-    FOREIGN KEY (`class_ID`) REFERENCES `class` (`class_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `subject_class` (`subject_class_ID`, `subject_ID`, `class_ID`, `subject_teacher_ID`) VALUES
 (1, 1, 1, 2),
@@ -241,61 +280,8 @@ INSERT INTO `subject_class` (`subject_class_ID`, `subject_ID`, `class_ID`, `subj
 (38, 38, 1, 2),
 (39, 39, 1, 2);
 
--- -------------------------------------------------------
-
--- CREATE TABLE `sections` (
---     `section_ID` INT(11) NOT NULL AUTO_INCREMENT,
---     `section_name` VARCHAR(255) NOT NULL,
---     `parent_section_ID` INT(11),
-
---     PRIMARY KEY (`section_ID`),
---     FOREIGN KEY (`parent_section_ID`) REFERENCES `sections` (`section_ID`) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- DELIMITER //
--- CREATE TRIGGER `check_parent_section_ID_trigger` BEFORE INSERT ON `sections`
--- FOR EACH ROW
--- BEGIN
---     IF NEW.parent_section_ID = NEW.section_ID THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
---     END IF;
--- END//
--- DELIMITER ;
-
--- ------------------------------------------------------
-
-CREATE TABLE `subject_class_sections` (
-    `section_ID` INT(11) NOT NULL AUTO_INCREMENT,
-    `subject_class_ID` INT(11) NOT NULL,
-    `section_name` VARCHAR(255) NOT NULL,
-    `parent_section_ID` INT(11),
-
-    PRIMARY KEY (`section_ID`),
-    FOREIGN KEY (`subject_class_ID`) REFERENCES `subject_class` (`subject_class_ID`),
-    FOREIGN KEY (`parent_section_ID`) REFERENCES `subject_class_sections` (`section_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DELIMITER //
-CREATE TRIGGER `check_parent_section_ID_trigger` BEFORE INSERT ON `subject_class_sections`
-FOR EACH ROW
-BEGIN
-    IF NEW.parent_section_ID = NEW.section_ID THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parent section ID cannot be the same as section ID';
-    END IF;
-END//
-
-CREATE TRIGGER `create_section_on_new_subject` AFTER INSERT ON `subject_class`
-FOR EACH ROW
-BEGIN
-    INSERT INTO `subject_class_sections` (`subject_class_ID`, `section_name`) VALUES (NEW.subject_class_ID, (SELECT `subject_name` FROM `subject` WHERE `subject_ID` = NEW.subject_ID));
-END//
-
-CREATE TRIGGER `delete_section_on_deleted_subject` AFTER DELETE ON `subject_class`
-FOR EACH ROW
-BEGIN
-    DELETE FROM `subject_class_sections` WHERE `subject_class_ID` = OLD.subject_class_ID;
-END//
-DELIMITER ;
+INSERT INTO `subject_class_sections` (`section_ID`, `subject_class_ID`, `section_name`, `section_description`, `parent_section_ID`) VALUES
+(40, 6, '2. UNGE I DAGENS MEDIEBILLEDE (SERIEANALYSE)', 'Vores brug af sproget kan variere på utroligt mange måder og med lige så mange forskellige betydninger til følge. I valg af enkelte ord kan du vælge at udtrykke dig med idiomer, metaforer, låneord, dialekt og meget andet og i konstruktionen af sætninger kan du gå fra det helt korte til sætninger på mange linjer. Effekterne kan være alt fra, at du giver dit sprog mere liv, til at du virker cool eller gør, at din modtager bedre forstår, hvad du siger. I dette forløb skal vi udforske forskellige måder at variere sproget på i alt fra stand up-shows og satire til holdningskampagner, sangtekster og romanuddrag.', 6);
 
 -- --------------------------------------------------------
 
@@ -373,15 +359,42 @@ CREATE TABLE `students_in_group`
 
 -- --------------------------------------------------------
 
+CREATE TABLE `file_types`
+(
+    `file_type_ID` INT(11) NOT NULL AUTO_INCREMENT,
+    `file_type` VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY (`file_type_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `file_types` (`file_type_ID`, `file_type`) VALUES
+(1, 'PDF'),
+(2, 'Word'),
+(3, 'Excel'),
+(4, 'PowerPoint'),
+(5, 'Text'),
+(6, 'Link'),
+(7, 'Zip'),
+(8, 'Image'),
+(9, 'Video'),
+(10, 'Audio'),
+(11, 'Other');
+
+-- --------------------------------------------------------
+
 CREATE TABLE `section_files`
 (
     `section_ID` INT(11) NOT NULL,
+    `file_type_ID` INT(11) NOT NULL,
     `file_name` VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (`section_ID`),
-    FOREIGN KEY (`section_ID`) REFERENCES `subject_class_sections` (`section_ID`)
+    FOREIGN KEY (`section_ID`) REFERENCES `subject_class_sections` (`section_ID`),
+    FOREIGN KEY (`file_type_ID`) REFERENCES `file_types` (`file_type_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `section_files` (`section_ID`, `file_type_ID`, `file_name`) VALUES
+(40, 1, 'Analyse');
 -- --------------------------------------------------------
 
 CREATE TABLE `schedule`
@@ -486,4 +499,5 @@ CREATE TABLE `message_reply`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `message_reply` (`message_ID`, `from_uid`, `message`) VALUES
-(1, 2, 'Hej Gunnar, hvad er dit spørgsmål?');
+(1, 2, 'Hej Gunnar, hvad er dit spørgsmål?'),
+(1, 1, 'Knækkestof');
