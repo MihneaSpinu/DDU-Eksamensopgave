@@ -14,7 +14,7 @@
           <div class="form-group">
             <input type="password" class="form-control" id="password" placeholder="Enter password" name="password">
           </div>
-          <input type="hidden" name="csrf_token" value="<?php echo Token::generate(); ?>">
+          <input type="hidden" name="csrf_token" value="<?php echo Token::generate('login_form'); ?>">
           <input type="submit" value="Log In" class="btn btn-primary">
         </form>
       </div>

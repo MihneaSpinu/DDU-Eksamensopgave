@@ -13,12 +13,14 @@ $schedule = array();
 foreach ($all_subjects as $subject) {
     $schedules = $db->get('schedule', array('subject_class_ID', '=', $subject->subject_class_ID))->results();
     foreach ($schedules as $s) {
-        $s->subject_name = $db->get('subject', array('subject_ID', '=', $subject->subject_ID))->first()->subject_name;
+        $subject = $db->get('subject', array('subject_ID', '=', $subject->subject_ID))->first();
+        $s->subject_name = $subject->subject_name;        
+        $s->color = $subject->subject_color;
         $schedule[] = $s;
     }
 }
 
-$today = "2024-03-27";
+$today = date('Y-m-d');
 $today_schedule = array();
 foreach ($schedule as $s) {
     if (date('Y-m-d', strtotime($s->date)) == $today) {
@@ -49,4 +51,20 @@ foreach ($all_homework as $homework) {
     if ($homework->submitted || date('Y-m-d H:i:s') > $homework->due_date) {
         $submitted_homework++;
     }
+}
+
+function darken($color, $amount)
+{
+    //AI har lavet det her matematik. Det er kun til at gøre hex farver mørkere
+    $color = str_replace('#', '', $color);
+    if (strlen($color) != 6) {
+        return '000000';
+    }
+    $rgb = '';
+    for ($x = 0; $x < 3; $x++) {
+        $c = hexdec(substr($color, $x * 2, 2)) - $amount;
+        $c = ($c < 0) ? 0 : dechex($c);
+        $rgb .= (strlen($c) < 2) ? '0' . $c : $c;
+    }
+    return '#' . $rgb;
 }

@@ -2,20 +2,22 @@
 
 class Token
 {
-    public static function generate()
+    public static function generate($form)
     {
-        return Session::put(Config::get('session/token_name'), Hash::make(uniqid()));
+        return Session::put("{$form}_token", Hash::make(uniqid()));
     }
 
-    public static function check($token)
+    public static function check($form, $token)
     {
-        $tokenName = Config::get('session/token_name');
+        $tokenName = $form . "_token";
 
         if(Session::exists($tokenName) && $token === Session::get($tokenName))
         {
+            Session::delete($tokenName);
             return true;
         }
 
+        Session::delete($tokenName);
         return false;
     }
 }
