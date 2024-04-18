@@ -20,7 +20,7 @@ foreach ($all_subjects as $subject) {
     }
 }
 
-$today = "2024-03-22";
+$today = date('Y-m-d');
 $today_schedule = array();
 foreach ($schedule as $s) {
     if (date('Y-m-d', strtotime($s->date)) == $today) {
@@ -56,7 +56,6 @@ foreach ($all_homework as $homework) {
 function darken($color, $amount)
 {
     //AI har lavet det her matematik. Det er kun til at gøre hex farver mørkere
-
     $color = str_replace('#', '', $color);
     if (strlen($color) != 6) {
         return '000000';

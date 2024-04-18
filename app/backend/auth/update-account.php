@@ -2,7 +2,7 @@
 require_once 'app/backend/core/Init.php';
 
 if (Input::exists()) {
-    if (Token::check(Input::get('csrf_token'))) {
+    if (Token::check('update_account_form', Input::get('csrf_token'))) {
         $validate = new Validation();
 
         $validation = $validate->check($_POST, array(

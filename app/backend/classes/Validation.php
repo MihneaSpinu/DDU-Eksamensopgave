@@ -19,9 +19,27 @@ class Validation
         {
             foreach ($rules as $rule => $rule_value)
             {
-
+                if (is_array($source[$item]))
+                {
+                    $source[$item] = implode(',', $source[$item]);
+                }
+                if (is_array($source[$item]) && !in_array($rule, ['required', 'optional'])) {
+                    continue;
+                }
+    
+                // If source is an array and it's required, add an error
+                if (is_array($source[$item]) && $rule === 'required' && empty($source[$item]['name'])) {
+                    $this->addError("{$item} is required.");
+                }
+    
+                // If the source is an array, skip further processing
+                if (is_array($source[$item])) {
+                    continue;
+                }
+    
                 $value = trim($source[$item]);
                 $item = escape($item);
+
 
                 if ($rule === 'optional' && ! empty($value))
                 {

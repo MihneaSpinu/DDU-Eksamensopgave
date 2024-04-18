@@ -1,8 +1,8 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-2 p-3 bg-primary d-flex flex-column vh-100 position-sticky top-0 shadow-lg d-sm-none d-md-block">
+    <div class="col-5 col-sm-4 col-md-3 col-lg-2 p-3 bg-secondary flex-column vh-100 position-sticky top-0 shadow-lg d-lg-block collapse" id="collapseSidebar">
       <div class="mb-4">
-        <a href="/" class="mb-md-0 me-md-auto text-decoration-none">
+        <a href="/" class="text-decoration-none">
           <img src="<?php echo FRONTEND_ASSET . "images/logo.png" ?>" class="w-100">
         </a>
       </div>
@@ -10,39 +10,47 @@
         <div class="border-linear shadow mx-auto">
           <div class="container bg-white rounded">
             <ul class="nav nav-pills flex-column">
-              <a class="text-muted my-2">Menu</a>
-              <li class="nav-item">
+              <div class="row">
+                <a class="text-muted my-2 col-4">Menu</a>
+                <!-- Close sidebar button -->
+                <div class="col-auto ml-auto">
+                  <button class="navbar-toggler d-block d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="true" aria-controls="collapseSidebar">
+                    <i class="fa fa-solid fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <li class="nav-item w-100">
                 <a class="nav-link" href="/">
                   Forside
                 </a>
               </li>
-              <li>
-                <a class="nav-link" href="/skema">
-                  Skema
-                </a>
-              </li>
-              <li class="nav-item">
-                <div class="d-flex justify-content-between align-items-center">
+              <?php if ($user_type != "censor") : ?>
+                <li>
+                  <a class="nav-link" href="/skema">
+                    Skema
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="/rum">Mine rum</a>
-                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapseSections" aria-expanded="false" aria-controls="collapseSections">
-                    <span class="navbar-toggler-icon"></span>
-                  </button>
-                </div>
-                <div class="collapse" id="collapseSections">
-                  <ul class="navbar-nav">
-                    <?php foreach ($all_sections as $section) {
-                      if ($section->parent_section_ID == 0) {
-                        echo "<li class='nav-item'><a class='nav-link' href='/rum/" . $section->section_ID . "'>" . $section->section_name . "</a></li>";
-                      }
-                    } ?>
-                  </ul>
-                </div>
-              </li>
-              <li>
-                <a class="nav-link" href="/samtaler">
-                  Samtaler
-                </a>
-              </li>
+                </li>
+                <li>
+                  <a class="nav-link" href="/samtaler">
+                    <div class="row">
+                      <div class="col ">
+                        Samtaler
+                      </div>
+                      <!-- If unread messages above 0, show circle to the right with number -->
+                      <?php if ($unread_messages > 0) : ?>
+                        <div class="mr-1 rounded-circle bg-primary text-white text-center d-flex justify-content-center align-items-center" style="width: 1.2rem; height: 1.2rem;">
+                          <?php echo $unread_messages; ?>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                  <!-- If unread messages above 0, show circle to the right with number -->
+
+                </li>
+              <?php endif; ?>
               <a class="border-top text-muted pt-2">Indstillinger</a>
 
               <li>
@@ -62,36 +70,60 @@
                   </div>
                 </li>
               <?php endif; ?>
+              <li class="dropdown mt-auto py-2">
+                <a href="#" class="align-items-center text-decoration-none dropdown-toggle row ml-2" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <!-- Make circle with user initials in center. User initials change text size to always fit in same circle -->
+                  <div class="d-flex justify-content-center align-items-center rounded-circle bg-primary col-auto" style="width: 2.5rem; height: 2.5rem;">
+                    <span><?php echo $user->data()->initials; ?></span>
+                  </div>
+                  <div class="col-auto">
+                    Bruger
+                  </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                  <li><a class="dropdown-item" href="/profile">Profil</a></li>
+                  <hr class="dropdown-divider">
+                  <li><a class="dropdown-item" href="/logout">Log ud</a></li>
+                </ul>
+              </li>
+              <li>
+                <?php if ($user_type == "student") : ?>
+                  <div class="border-top py-2">
+                    <?php if ($next_homework) : ?>
+                      <a><b>Næste aflevering:</b></a><br>
+                      <a href="/aflevering?id=<?php echo $next_homework->homework_ID; ?>">
+                        <?php echo $subject->subject_name . ", om " . $time; ?>
+                      </a>
+                    <?php else : ?>
+                      <a>Ingen afleveringer</a>
+                    <?php endif; ?>
+                  </div>
+                <?php endif; ?>
+              </li>
             </ul>
           </div>
         </div>
       </div>
-      <div class="dropdown mt-auto py-2">
-        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-          <!-- Make circle with user initials in center. User initials change text size to always fit in same circle -->
-          <div class="d-flex justify-content-center align-items-center rounded-circle bg-light" style="width: 2.5rem; height: 2.5rem;">
-            <span class="text-dark"><?php echo $user->data()->initials; ?></span>
-          </div>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-          <li><a class="dropdown-item" href="#">Filler</a></li>
-          <li><a class="dropdown-item" href="/præferencer">Præferencer</a></li>
-          <li><a class="dropdown-item" href="/profile">Profil</a></li>
-          <hr class="dropdown-divider">
-          <li><a class="dropdown-item" href="/logout">Sign out</a></li>
-        </ul>
-      </div>
-      <div class="border-top">
-        <?php
-        //If next homework exists:
-        if ($next_homework) : ?>
-          <a><b>Næste aflevering:</b></a><br>
-        <?php echo $subject->subject_name . ", om " . $time;
-        else : ?>
-          <a>Ingen afleveringer</a>
-        <?php endif; ?>
-      </div>
     </div>
+    <!-- 
+    <nav class="navbar sticky-top navbar-expand-sm">
+      <div class="container yellow-color">
+        <div class="row mx-auto">
+          <div class="col-2 d-flex justify-content-center h-75 my-auto align-items-center pl-0">
+            <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#collapsibleHeader">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
+          <a class="col mx-auto navbar-brand justify-content-center d-flex" href="/">
+            <img class="w-100 h-auto" src="<?php echo FRONTEND_ASSET . 'logo.png'; ?>" alt="logo">
+          </a>
+          <div class="col-2 d-flex align-items-center justify-content-center">
+            <a class="nav-link px-0 ml-auto" href="/cart">
+              <i class="fa fa-shopping-cart"></i>
+              <?php echo $cartHTML; ?>
+            </a>
+          </div>
+          <div class="collapse navbar-collapse" id="collapsibleHeader"> -->
 
     <script>
       //Make nav-item active based on url
@@ -104,5 +136,8 @@
       });
     </script>
 
-    <div class="col-md-10 col-sm-12">
-      <div class="container my-5">
+    <div class="col-md-12 col-sm-12 col-lg-10">
+      <div class="container my-5 mx-auto">
+        <button class="navbar-toggler d-block d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="true" aria-controls="collapseSidebar">
+          <i class="fa fa-solid fa-bars"></i>
+        </button>
